@@ -64,9 +64,12 @@ class _ZAnimatedToggleState extends State<ZAnimatedToggle> {
             duration: Duration(milliseconds: 350),
             curve: Curves.ease,
             child: Container(
+              alignment: Alignment.center,
               width: width * 0.35,
               height: width * 0.13,
               decoration: ShapeDecoration(
+                color: themeProvider.themeMode().toggleBackgroundColor,
+                shadows: themeProvider.themeMode().shadow,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(width * 0.1),
                 ),
@@ -75,6 +78,10 @@ class _ZAnimatedToggleState extends State<ZAnimatedToggle> {
                 themeProvider.isLightTheme
                     ? widget.values[0]
                     : widget.values[1],
+                style: TextStyle(
+                  fontSize: width * 0.045,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),

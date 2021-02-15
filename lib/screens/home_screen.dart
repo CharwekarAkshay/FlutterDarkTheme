@@ -8,7 +8,28 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 800),
+    );
+    super.initState();
+  }
+
+  changeThemeMode(bool theme) {
+    if (!theme) {
+      _animationController.forward(from: 0.0);
+    } else {
+      _animationController.reverse(from: 1.0);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -17,23 +38,51 @@ class _HomeScreenState extends State<HomeScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
+      key: _scaffoldKey,
       body: SafeArea(
         child: Container(
           alignment: Alignment.center,
           margin: EdgeInsets.only(top: height * 0.1),
           child: Column(
             children: [
-              Container(
-                width: width * 0.35,
-                height: width * 0.35,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: themeProvider.themeMode().gradient,
-                    begin: Alignment.bottomLeft,
-                    end: Alignment.topRight,
+              Stack(
+                children: [
+                  Container(
+                    width: width * 0.35,
+                    height: width * 0.35,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: themeProvider.themeMode().gradient,
+                        begin: Alignment.bottomLeft,
+                        end: Alignment.topRight,
+                      ),
+                    ),
                   ),
-                ),
+                  Transform.translate(
+                    offset: Offset(40, 0),
+                    child: ScaleTransition(
+                      scale: _animationController.drive(
+                        Tween<double>(
+                          begin: 0.0,
+                          end: 1.0,
+                        ).chain(
+                          CurveTween(curve: Curves.decelerate),
+                        ),
+                      ),
+                      child: Container(
+                        width: width * 0.26,
+                        height: 0.26,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: themeProvider.isLightTheme
+                              ? Colors.white
+                              : Color(0xFF26242E),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: height * 0.1),
               Text(
@@ -57,9 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 values: ['Light', 'Dark'],
                 onToggleCallback: (v) async {
                   await themeProvider.toggleThemeData();
-                  setState(() {
-                    
-                  });
+                  setState(() {});
                 },
               ),
             ],
